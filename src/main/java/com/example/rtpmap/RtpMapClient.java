@@ -21,6 +21,11 @@ public class RtpMapClient implements ClientModInitializer {
     private static KeyBinding zoomOutKey;
     private static KeyBinding settingsKey;
 
+    /** 1 zoom level per press (500 blocks), 10 levels while holding Shift. */
+    private static int zoomStep() {
+        return net.minecraft.client.gui.screen.Screen.hasShiftDown() ? 10 : 1;
+    }
+
     @Override
     public void onInitializeClient() {
         RtpConfig.load();
@@ -44,11 +49,11 @@ public class RtpMapClient implements ClientModInitializer {
                 if (client.currentScreen == null) client.setScreen(new RtpConfigScreen());
             }
             while (zoomInKey.wasPressed()) {
-                RtpConfig.radiusIdx = Math.max(0, RtpConfig.radiusIdx - 1);
+                RtpConfig.setZoom(RtpConfig.zoomLevel - zoomStep());
                 RtpConfig.save();
             }
             while (zoomOutKey.wasPressed()) {
-                RtpConfig.radiusIdx = Math.min(RtpConfig.RADII.length - 1, RtpConfig.radiusIdx + 1);
+                RtpConfig.setZoom(RtpConfig.zoomLevel + zoomStep());
                 RtpConfig.save();
             }
         });
