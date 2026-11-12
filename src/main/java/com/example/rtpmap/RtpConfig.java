@@ -11,10 +11,10 @@ import java.util.Properties;
 
 public final class RtpConfig {
     /** Map radius steps in blocks (half the width of the visible area). */
-    public static final int[] RADII = {500, 1000, 2500, 5000, 10000, 25000, 50000, 125000};
+    public static final int[] RADII = {100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 125000};
 
     public static boolean enabled = true;
-    public static int radiusIdx = 3;
+    public static int radiusIdx = 3; // 1000 blocks
     public static int x = 6;
     public static int y = 6;
     public static int size = 128;
