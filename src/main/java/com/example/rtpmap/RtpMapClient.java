@@ -19,6 +19,7 @@ public class RtpMapClient implements ClientModInitializer {
     private static KeyBinding toggleKey;
     private static KeyBinding zoomInKey;
     private static KeyBinding zoomOutKey;
+    private static KeyBinding settingsKey;
 
     @Override
     public void onInitializeClient() {
@@ -31,10 +32,16 @@ public class RtpMapClient implements ClientModInitializer {
         zoomOutKey = KeyBindingHelper.registerKeyBinding(
                 new KeyBinding("key.rtpmap.zoom_out", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_BRACKET, CATEGORY));
 
+        settingsKey = KeyBindingHelper.registerKeyBinding(
+                new KeyBinding("key.rtpmap.settings", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_O, CATEGORY));
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (toggleKey.wasPressed()) {
                 RtpConfig.enabled = !RtpConfig.enabled;
                 RtpConfig.save();
+            }
+            while (settingsKey.wasPressed()) {
+                if (client.currentScreen == null) client.setScreen(new RtpConfigScreen());
             }
             while (zoomInKey.wasPressed()) {
                 RtpConfig.radiusIdx = Math.max(0, RtpConfig.radiusIdx - 1);
