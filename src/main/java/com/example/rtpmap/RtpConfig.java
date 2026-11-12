@@ -10,9 +10,9 @@ import java.nio.file.Path;
 import java.util.Properties;
 
 public final class RtpConfig {
-    /** Zoom level 1..100, each level = 500 blocks of map radius (level 2 = 1000 blocks). */
+    /** Zoom level 1..30, each level = 500 blocks of map radius (level 2 = 1000 blocks). */
     public static final int ZOOM_MIN = 1;
-    public static final int ZOOM_MAX = 100;
+    public static final int ZOOM_MAX = 30;
     public static final int BLOCKS_PER_LEVEL = 500;
 
     public static boolean enabled = true;
@@ -64,7 +64,7 @@ public final class RtpConfig {
             p.setProperty("y", Integer.toString(y));
             p.setProperty("size", Integer.toString(size));
             try (OutputStream out = Files.newOutputStream(file())) {
-                p.store(out, "RTP Map config (zoomLevel 1-100, 500 blocks per level; x,y = HUD position in GUI pixels; size = map size in GUI pixels)");
+                p.store(out, "RTP Map config (zoomLevel 1-30, 500 blocks per level; x,y = HUD position in GUI pixels; size = map size in GUI pixels)");
             }
         } catch (IOException e) {
             System.err.println("[RtpMap] Could not write config: " + e.getMessage());
