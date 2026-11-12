@@ -10,19 +10,26 @@ import java.nio.file.Path;
 import java.util.Properties;
 
 public final class RtpConfig {
-    /** Map radius steps in blocks (half the width of the visible area). */
-    public static final int[] RADII = {100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 125000};
+    /** Zoom level 1..100, each level = 500 blocks of map radius (level 2 = 1000 blocks). */
+    public static final int ZOOM_MIN = 1;
+    public static final int ZOOM_MAX = 100;
+    public static final int BLOCKS_PER_LEVEL = 500;
 
     public static boolean enabled = true;
-    public static int radiusIdx = 3; // 1000 blocks
+    public static int zoomLevel = 2;
     public static int x = 6;
     public static int y = 6;
     public static int size = 128;
 
     private RtpConfig() {}
 
+    /** Map radius in blocks (half the width of the visible area). */
     public static int radius() {
-        return RADII[Math.max(0, Math.min(RADII.length - 1, radiusIdx))];
+        return zoomLevel * BLOCKS_PER_LEVEL;
+    }
+
+    public static void setZoom(int level) {
+        zoomLevel = clamp(level, ZOOM_MIN, ZOOM_MAX);
     }
 
     private static Path file() {
@@ -39,7 +46,7 @@ public final class RtpConfig {
             Properties p = new Properties();
             p.load(in);
             enabled = Boolean.parseBoolean(p.getProperty("enabled", "true"));
-            radiusIdx = clamp(parse(p, "radiusIdx", 3), 0, RADII.length - 1);
+            setZoom(parse(p, "zoomLevel", 2));
             x = parse(p, "x", 6);
             y = parse(p, "y", 6);
             size = clamp(parse(p, "size", 128), 64, 400);
@@ -52,12 +59,12 @@ public final class RtpConfig {
         try {
             Properties p = new Properties();
             p.setProperty("enabled", Boolean.toString(enabled));
-            p.setProperty("radiusIdx", Integer.toString(radiusIdx));
+            p.setProperty("zoomLevel", Integer.toString(zoomLevel));
             p.setProperty("x", Integer.toString(x));
             p.setProperty("y", Integer.toString(y));
             p.setProperty("size", Integer.toString(size));
             try (OutputStream out = Files.newOutputStream(file())) {
-                p.store(out, "RTP Map config (x,y = HUD position in GUI pixels, size = map size in GUI pixels)");
+                p.store(out, "RTP Map config (zoomLevel 1-100, 500 blocks per level; x,y = HUD position in GUI pixels; size = map size in GUI pixels)");
             }
         } catch (IOException e) {
             System.err.println("[RtpMap] Could not write config: " + e.getMessage());
