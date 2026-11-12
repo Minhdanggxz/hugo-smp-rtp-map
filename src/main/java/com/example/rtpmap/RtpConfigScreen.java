@@ -19,12 +19,14 @@ public class RtpConfigScreen extends Screen {
     protected void init() {
         int w = 200, h = 20;
         int x = this.width / 2 - w / 2;
-        int y = this.height - 100;
+        int y = this.height - 148;
 
         addDrawableChild(new ZoomSlider(x, y, w, h));
         addDrawableChild(new SizeSlider(x, y + 24, w, h));
+        addDrawableChild(new PosSlider(x, y + 48, w, h, true));
+        addDrawableChild(new PosSlider(x, y + 72, w, h, false));
         addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close())
-                .dimensions(x, y + 52, w, h).build());
+                .dimensions(x, y + 100, w, h).build());
     }
 
     @Override
@@ -35,7 +37,7 @@ public class RtpConfigScreen extends Screen {
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         super.render(ctx, mouseX, mouseY, delta);
-        ctx.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, this.height - 116, 0xFFFFFFFF);
+        ctx.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, this.height - 164, 0xFFFFFFFF);
     }
 
     @Override
@@ -50,18 +52,20 @@ public class RtpConfigScreen extends Screen {
 
     private static final class ZoomSlider extends SliderWidget {
         ZoomSlider(int x, int y, int w, int h) {
-            super(x, y, w, h, Text.empty(), (double) RtpConfig.radiusIdx / (RtpConfig.RADII.length - 1));
+            super(x, y, w, h, Text.empty(),
+                    (double) (RtpConfig.zoomLevel - RtpConfig.ZOOM_MIN) / (RtpConfig.ZOOM_MAX - RtpConfig.ZOOM_MIN));
             updateMessage();
         }
 
         @Override
         protected void updateMessage() {
-            setMessage(Text.literal("Zoom: " + RtpConfig.radius() + " blocks"));
+            setMessage(Text.literal("Zoom: " + RtpConfig.zoomLevel + " (" + RtpConfig.radius() + " blocks)"));
         }
 
         @Override
         protected void applyValue() {
-            RtpConfig.radiusIdx = (int) Math.round(this.value * (RtpConfig.RADII.length - 1));
+            RtpConfig.setZoom(RtpConfig.ZOOM_MIN
+                    + (int) Math.round(this.value * (RtpConfig.ZOOM_MAX - RtpConfig.ZOOM_MIN)));
             updateMessage();
         }
     }
@@ -80,6 +84,39 @@ public class RtpConfigScreen extends Screen {
         @Override
         protected void applyValue() {
             RtpConfig.size = SIZE_MIN + (int) Math.round(this.value * (SIZE_MAX - SIZE_MIN));
+            updateMessage();
+        }
+    }
+
+    /** Moves the map on screen. X = horizontal, Y = vertical (GUI pixels from the top-left). */
+    private static final class PosSlider extends SliderWidget {
+        private final boolean horizontal;
+
+        PosSlider(int x, int y, int w, int h, boolean horizontal) {
+            super(x, y, w, h, Text.empty(), 0);
+            this.horizontal = horizontal;
+            this.value = max() <= 0 ? 0 : Math.max(0.0, Math.min(1.0, (double) (horizontal ? RtpConfig.x : RtpConfig.y) / max()));
+            updateMessage();
+        }
+
+        private int max() {
+            int s = RtpConfig.size;
+            return horizontal
+                    ? Math.max(0, RtpScreens.width() - RtpHud.panelWidth(s))
+                    : Math.max(0, RtpScreens.height() - RtpHud.panelHeight(s));
+        }
+
+        @Override
+        protected void updateMessage() {
+            setMessage(Text.literal((horizontal ? "Position X: " : "Position Y: ")
+                    + (horizontal ? RtpConfig.x : RtpConfig.y)));
+        }
+
+        @Override
+        protected void applyValue() {
+            int v = (int) Math.round(this.value * max());
+            if (horizontal) RtpConfig.x = v;
+            else RtpConfig.y = v;
             updateMessage();
         }
     }
