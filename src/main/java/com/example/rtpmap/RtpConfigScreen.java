@@ -59,7 +59,7 @@ public class RtpConfigScreen extends Screen {
 
         @Override
         protected void updateMessage() {
-            setMessage(Text.literal("Zoom: " + RtpConfig.zoomLevel + " (" + RtpConfig.radius() + " blocks)"));
+            setMessage(Text.literal("Zoom: " + RtpConfig.zoomLevel));
         }
 
         @Override
