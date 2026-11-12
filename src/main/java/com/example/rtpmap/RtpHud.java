@@ -85,24 +85,32 @@ public final class RtpHud {
                 lastKZ = kz;
                 lastSize = S;
             }
-            int dot = radius <= 1000 ? 2 : 1;
+            int dot = radius <= 250 ? 3 : (radius <= 1000 ? 2 : 1);
             for (int i = 0; i < pixN; i++) {
                 int p = pix[i];
                 int ix = p % S, iy = p / S;
                 int x = mx + ix, y = my + iy;
                 ctx.fill(x, y, Math.min(x + dot, mx + S), Math.min(y + dot, my + S), POINT);
             }
-            label = idx.count + " pts | r" + radius;
+            label = (int) Math.floor(px) + ", " + (int) Math.floor(pz) + "  r" + radius;
+            String cnt = Integer.toString(idx.count);
+            ctx.drawText(font, cnt, px0 + w - PAD - font.getWidth(cnt), py0 + 3, TEXT, false);
         } else if (cloud.error != null) {
             label = "Error (see log)";
         } else {
             label = "Loading...";
         }
 
-        // you: yellow square + stem (like the original)
+        // you: yellow square + short pointer showing where you face (north is up)
         int cx = mx + S / 2, cy = my + S / 2;
         ctx.fill(cx - 1, cy - 1, cx + 2, cy + 2, PLAYER);
-        ctx.fill(cx, cy + 2, cx + 1, cy + 5, PLAYER);
+        double yaw = Math.toRadians(mc.player.getYaw());
+        double fx = -Math.sin(yaw), fz = Math.cos(yaw);
+        for (int t = 3; t <= 7; t += 2) {
+            int dx = cx + (int) Math.round(fx * t);
+            int dy = cy + (int) Math.round(fz * t);
+            ctx.fill(dx, dy, dx + 1, dy + 1, PLAYER);
+        }
 
         ctx.drawText(font, label, px0 + PAD, my + S + 3, TEXT, false);
     }
