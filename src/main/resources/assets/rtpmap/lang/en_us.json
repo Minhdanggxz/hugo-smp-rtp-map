@@ -1,5 +1,6 @@
 {
   "key.rtpmap.toggle": "Toggle RTP map",
+  "key.rtpmap.settings": "Open RTP map settings",
   "key.rtpmap.zoom_in": "Zoom in",
   "key.rtpmap.zoom_out": "Zoom out",
   "category.rtpmap": "RTP Map"
