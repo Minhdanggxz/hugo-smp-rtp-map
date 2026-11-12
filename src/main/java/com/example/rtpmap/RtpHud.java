@@ -31,6 +31,14 @@ public final class RtpHud {
 
     private RtpHud() {}
 
+    public static int panelWidth(int mapSize) {
+        return mapSize + PAD * 2;
+    }
+
+    public static int panelHeight(int mapSize) {
+        return TITLE_H + mapSize + PAD + LABEL_H;
+    }
+
     public static String dimKey(World world) {
         if (world.getRegistryKey().equals(World.NETHER)) return "nether";
         if (world.getRegistryKey().equals(World.END)) return "end";
@@ -48,10 +56,12 @@ public final class RtpHud {
 
         int S = RtpConfig.size;
         int radius = RtpConfig.radius();
-        int px0 = RtpConfig.x, py0 = RtpConfig.y;
+        int w = panelWidth(S);
+        int h = panelHeight(S);
+        // keep the panel fully on screen even if the window / GUI scale changed
+        int px0 = Math.max(0, Math.min(RtpConfig.x, mc.getWindow().getScaledWidth() - w));
+        int py0 = Math.max(0, Math.min(RtpConfig.y, mc.getWindow().getScaledHeight() - h));
         int mx = px0 + PAD, my = py0 + TITLE_H;
-        int w = S + PAD * 2;
-        int h = TITLE_H + S + PAD + LABEL_H;
         TextRenderer font = mc.textRenderer;
 
         // panel
